@@ -227,5 +227,37 @@ func (rl *rateLimiter) allow(maxRequests int, duration time.Duration) bool {
 	cutoff := now.Add(-duration)
 
 	// Удаляем старые запросы
-	
+	valid := make([]time.Time, 0, len(rl.requests))
+	for _, t := range rl.requests {
+		if t.After(cutoff) {
+			valid = append(valid, t) 
+		}
+	}
+	rl.requests = valid 
+
+	if len(rl.requests) >= maxRequests {
+		return false 
+	}
+
+	rl.requests = append(rl.requests, now)
+	return true
+}
+
+func generateRequestID() string {
+	return time.Now().Format("20060102150405") + randomString(6)
+}
+
+func randomString(n int) string {
+	// Упрощенно, в продакшене используйте crypto/rand
+	return "req123"
+}
+
+func getRoutePath(r *http.Request) string {
+	// Получаем маршрут из контекста Gorilla Mux
+	if route := mux.CurrentRoute(r); route != nil {
+		if path, err := route.GetPathTemplate(); err == nil {
+			return path
+		} 
+	}
+	return r.URL.Path 
 }
