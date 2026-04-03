@@ -46,7 +46,7 @@ func Load() (*Config, error) {
 	_ = godotenv.Load()
 
 	cfg := &Config{
-		Environment: getEnv("ENVIRONMENT", "production"),
+		Environment: getEnv("ENVIRONMENT", "development"),
 		ServiceName: getEnv("SERVICE_NAME", "myapp"),
 
 		// Сервер
@@ -76,8 +76,10 @@ func Load() (*Config, error) {
 	}
 
 	// Валидация критичных настроек
-	if cfg.Environment == "production" && cfg.JWTSecret == "your-secret-key" {
-		return nil, fmt.Errorf("JWT_SECRET must be changed in production")
+	if cfg.Environment == "production" {
+		if cfg.JWTSecret == "your-secret-key" {
+			return nil, fmt.Errorf("JWT_SECRET must be changed in production")
+		}
 	}
 
 	return cfg, nil

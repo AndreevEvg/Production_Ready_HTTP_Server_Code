@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Server представляет HTTP сервер
@@ -59,7 +60,7 @@ func (s *Server) setupRoutes() {
 	handlers.RegisterRoutes(s.router)
 
 	// Метрики Prometheus
-	s.router.Handle("/metrics", promhttp.Handler().Methods("GET"))
+	s.router.Handle("/metrics", promhttp.Handler()).Methods("GET")
 
 	// Статические файлы (если есть)
 	s.router.PathPrefix("/static/").Handler(
